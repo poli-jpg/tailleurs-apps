@@ -1,0 +1,10 @@
+{
+  "name": "Atelier – gestion de couture",
+  "short_name": "Atelier",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F4F8",
+  "theme_color": "#1E2A5A",
+  "lang": "fr",
+  "icons": []
+}

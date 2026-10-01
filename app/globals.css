@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-fond font-corps text-texte antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid #C2410C;
+  outline-offset: 2px;
+}
+
+@layer components {
+  .champ {
+    @apply h-12 w-full rounded-xl border border-[#D9DEEA] bg-white px-3.5 text-[15px] text-texte;
+  }
+  .etiquette {
+    @apply text-sm font-semibold;
+  }
+  .bouton {
+    @apply flex h-[52px] w-full items-center justify-center gap-2.5 rounded-[14px] text-base font-semibold;
+  }
+  .carte {
+    @apply rounded-2xl border border-ligne bg-white;
+  }
+  .puce {
+    @apply inline-flex h-9 items-center rounded-full border border-[#D9DEEA] bg-white px-3.5 text-sm;
+  }
+  .puce-active {
+    @apply border-encre bg-encre font-semibold text-white;
+  }
+}
