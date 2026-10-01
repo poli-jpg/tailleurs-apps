@@ -79,26 +79,38 @@ export default async function DetailCommande({ params }: { params: { id: string 
           <h2 className="text-base font-bold">{c.modele}</h2>
           <Badge statut={c.statut} retard={retard} />
         </div>
-        <ol className="grid grid-cols-5 gap-1">
+                <ol className="grid grid-cols-5 gap-1">
           {STATUTS.map((s, i) => {
             const fait = i < indexActuel || (i === indexActuel && s === 'livree');
             const actuel = i === indexActuel && s !== 'livree';
             return (
-              <li key={s} className="flex flex-col items-center gap-1.5">
-                <span
-                  className={`flex h-[30px] w-[30px] items-center justify-center rounded-full ${
-                    fait ? 'bg-encre text-white' : actuel ? 'border-[3px] border-accent bg-white' : 'border-2 border-[#B8BFD3] bg-white'
-                  }`}
-                >
-                  {fait && (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12l5 5L20 7" /></svg>
-                  )}
-                </span>
-                <span className={`text-xs ${actuel ? 'font-bold' : fait ? '' : 'text-doux'}`}>{ETAPES[s]}</span>
+              <li key={s}>
+                <form action={changerStatut}>
+                  <input type="hidden" name="commande_id" value={c.id} />
+                  <input type="hidden" name="statut" value={s} />
+                  <button
+                    type="submit"
+                    disabled={i === indexActuel}
+                    aria-label={`Passer à : ${ETAPES[s]}`}
+                    className="flex min-h-[56px] w-full flex-col items-center gap-1.5 rounded-xl py-1 active:bg-fond"
+                  >
+                    <span
+                      className={`flex h-[30px] w-[30px] items-center justify-center rounded-full ${
+                        fait ? 'bg-encre text-white' : actuel ? 'border-[3px] border-accent bg-white' : 'border-2 border-[#B8BFD3] bg-white'
+                      }`}
+                    >
+                      {fait && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12l5 5L20 7" /></svg>
+                      )}
+                    </span>
+                    <span className={`text-xs ${actuel ? 'font-bold' : fait ? '' : 'text-doux'}`}>{ETAPES[s]}</span>
+                  </button>
+                </form>
               </li>
             );
           })}
         </ol>
+        <p className="-mt-2 text-center text-xs text-doux">Touchez une étape pour changer le statut.</p>
         <p className={`rounded-xl px-3 py-2.5 text-sm ${retard ? 'bg-accent text-white' : 'bg-fond'}`}>
           Livraison <strong>{dateCourte(c.date_livraison)}</strong>
           {j !== null && c.statut !== 'livree' && (j > 0 ? `, dans ${j} jour${j > 1 ? 's' : ''}` : j === 0 ? ", aujourd’hui" : `, en retard de ${-j} jour${j < -1 ? 's' : ''}`)}
