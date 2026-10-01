@@ -59,10 +59,17 @@ export default function Connexion() {
         </button>
       </form>
 
-      <button type="button" onClick={() => { setMode(mode === 'connexion' ? 'inscription' : 'connexion'); setErreur(''); }}
-        className="text-sm font-semibold text-encre underline">
-        {mode === 'connexion' ? 'Pas encore de compte ? Créer un compte' : 'Déjà un compte ? Se connecter'}
-      </button>
+            <p className="text-center text-sm text-doux">
+        Pas encore de compte ?{' '}
+        <a
+          href="https://wa.me/221784653251?text=Bonjour%2C%20je%20suis%20tailleur%20et%20je%20voudrais%20utiliser%20l%E2%80%99appli%20Atelier."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-encre underline"
+        >
+          Contactez-nous sur WhatsApp
+        </a>
+      </p>
     </main>
   );
 }
