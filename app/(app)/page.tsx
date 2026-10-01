@@ -93,9 +93,9 @@ export default async function Accueil({ searchParams }: { searchParams: { filtre
         </div>
       </div>
 
-      <section className="flex flex-col gap-2.5 px-5 pt-5">
+            <section className="mt-5 flex flex-col divide-y divide-ligne border-y border-ligne bg-white">
         {visibles.length === 0 ? (
-          <div className="carte flex flex-col items-start gap-3 p-5">
+          <div className="flex flex-col items-start gap-3 p-5">
             <p className="font-semibold">{commandes.length === 0 ? 'Aucune commande pour l’instant' : 'Aucune commande ici'}</p>
             <p className="text-sm text-doux">
               {commandes.length === 0 ? 'Enregistrez votre première commande : client, modèle, prix et date de livraison.' : 'Changez de filtre ou de recherche.'}
@@ -106,7 +106,7 @@ export default async function Accueil({ searchParams }: { searchParams: { filtre
           </div>
         ) : (
           visibles.map((c) => (
-            <Link key={c.id} href={`/commandes/${c.id}`} className="carte flex items-center gap-3 p-3.5">
+            <Link key={c.id} href={`/commandes/${c.id}`} className="flex items-center gap-3 px-5 py-3.5 active:bg-fond">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-pale font-bold text-encre">{initiales(c.client_nom)}</span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="truncate text-[15px] font-semibold">{c.client_nom}</span>
