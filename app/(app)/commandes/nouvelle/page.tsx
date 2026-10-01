@@ -15,7 +15,7 @@ function ChampPhoto({ name, libelle }: { name: string; libelle: string }) {
     <label className="flex h-[92px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] border-2 border-dashed border-[#A9B1C8] bg-white text-sm font-semibold text-encre">
       {iconePhoto}
       {libelle}
-      <input type="file" name={name} accept="image/*" capture="environment" className="sr-only" />
+            <input type="file" name={name} accept="image/*" className="sr-only" />
     </label>
   );
 }
