@@ -62,3 +62,34 @@ img {
     @apply border-encre bg-encre font-semibold text-white;
   }
 }
+
+/* Bande sous l'heure / l'encoche : le contenu ne passe plus dessous en défilant */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: env(safe-area-inset-top);
+  background: #F2F4F8;
+  z-index: 50;
+}
+
+/* iPhone : les champs date débordent sinon */
+input[type='date'] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  text-align: left;
+}
+input[type='date']::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+/* « Ajouter un client » : pas de petit triangle */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}

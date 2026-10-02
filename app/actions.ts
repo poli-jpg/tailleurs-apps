@@ -18,6 +18,19 @@ async function envoyerPhoto(supabase: SupabaseClient, atelierId: string, v: Form
   return chemin;
 }
 
+/** Cherche un client existant de l'atelier avec le même numéro (évite les doublons) */
+async function clientParTelephone(supabase: SupabaseClient, atelierId: string, telephone: string | null) {
+  const chiffres = (telephone ?? '').replace(/\D/g, '').slice(-9);
+  if (chiffres.length < 9) return null;
+  const { data } = await supabase
+    .from('clients')
+    .select('id, telephone')
+    .eq('atelier_id', atelierId)
+    .ilike('telephone', `%${chiffres.slice(-4)}%`);
+  const trouve = (data ?? []).find((c) => (c.telephone ?? '').replace(/\D/g, '').slice(-9) === chiffres);
+  return trouve ? (trouve.id as string) : null;
+}
+
 export async function creerAtelier(formData: FormData) {
   const supabase = createClient();
   const nom = texte(formData.get('nom'));
@@ -32,9 +45,12 @@ export async function creerClient(formData: FormData) {
   const nom = texte(formData.get('nom'));
   if (!nom) throw new Error('Indiquez le nom du client.');
   const genre = formData.get('genre') === 'femme' ? 'femme' : 'homme';
+  const telephone = texte(formData.get('telephone'));
+  const existant = await clientParTelephone(supabase, atelier.id, telephone);
+  if (existant) redirect(`/clients/${existant}`);
   const { data, error } = await supabase
     .from('clients')
-    .insert({ atelier_id: atelier.id, nom, telephone: texte(formData.get('telephone')), genre })
+    .insert({ atelier_id: atelier.id, nom, telephone, genre })
     .select('id')
     .single();
   if (error) throw new Error(error.message);
@@ -77,6 +93,10 @@ export async function creerCommande(formData: FormData) {
   if (!clientId) {
     const nom = texte(formData.get('client_nom'));
     if (!nom) throw new Error('Choisissez un client ou saisissez le nom d’un nouveau client.');
+    clientId = await clientParTelephone(supabase, atelier.id, texte(formData.get('client_telephone')));
+  }
+  if (!clientId) {
+    const nom = texte(formData.get('client_nom'))!;
     const { data, error } = await supabase
       .from('clients')
       .insert({
