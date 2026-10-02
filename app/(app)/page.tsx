@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BandeauAbonnement } from '@/components/BandeauAbonnement';
 import { getAtelier } from '@/lib/atelier';
 import { aujourdhui, dansNJours, dateCourte, fcfa, initiales } from '@/lib/format';
 import { estEnRetard, type Statut } from '@/lib/statuts';
@@ -76,6 +77,8 @@ export default async function Accueil({ searchParams }: { searchParams: { filtre
           </div>
         </div>
       </header>
+
+      <BandeauAbonnement atelier={atelier} />
 
       <div className="flex flex-col gap-3 px-5 pt-4">
         <form className="flex h-12 items-center gap-2.5 rounded-xl border border-[#D9DEEA] bg-white px-3.5">
