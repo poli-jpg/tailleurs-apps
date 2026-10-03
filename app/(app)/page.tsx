@@ -22,7 +22,7 @@ const FILTRES = [
   { cle: 'retard', libelle: 'En retard' },
 ] as const;
 
-export default async function Accueil({ searchParams }: { searchParams: { filtre?: string; q?: string } }) {
+export default async function Accueil({ searchParams }: { searchParams: { filtre?: string; q?: string; tout?: string } }) {
   const { supabase, atelier } = await getAtelier();
   const { data } = await supabase
     .from('commandes_resume')
@@ -48,6 +48,17 @@ export default async function Accueil({ searchParams }: { searchParams: { filtre
     if (filtre === 'retard') return estEnRetard(c.statut, c.date_livraison, jour);
     return true;
   });
+
+  // 5 commandes au départ, le reste derrière « Voir plus »
+  const LIMITE = 5;
+  const tout = searchParams.tout === '1';
+  const affichees = tout ? visibles : visibles.slice(0, LIMITE);
+  const restantes = visibles.length - affichees.length;
+  const lienTout = `/?${new URLSearchParams({
+    ...(filtre !== 'toutes' ? { filtre } : {}),
+    ...(q ? { q: searchParams.q ?? '' } : {}),
+    tout: '1',
+  }).toString()}`;
 
   return (
     <main>
@@ -107,7 +118,7 @@ export default async function Accueil({ searchParams }: { searchParams: { filtre
             )}
           </div>
         ) : (
-          visibles.map((c) => (
+          affichees.map((c) => (
             <Link key={c.id} href={`/commandes/${c.id}`} className="flex items-center gap-3 px-5 py-3.5 active:bg-fond">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-pale font-bold text-encre">{initiales(c.client_nom)}</span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -123,6 +134,14 @@ export default async function Accueil({ searchParams }: { searchParams: { filtre
           ))
         )}
       </section>
+
+      {restantes > 0 && (
+        <div className="px-5 pt-3">
+          <Link href={lienTout} scroll={false} className="flex h-12 w-full items-center justify-center rounded-xl border border-[#D9DEEA] bg-white text-sm font-semibold text-encre active:bg-fond">
+            Voir plus ({restantes} autre{restantes > 1 ? 's' : ''})
+          </Link>
+        </div>
+      )}
     </main>
   );
 }
