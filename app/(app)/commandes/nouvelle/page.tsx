@@ -3,23 +3,7 @@ import { creerCommande } from '@/app/actions';
 import { Retour } from '@/components/Retour';
 import { BoutonEnvoi } from '@/components/BoutonEnvoi';
 import { ChoixClient } from '@/components/ChoixClient';
-
-const iconePhoto = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
-    <circle cx="12" cy="13" r="3.5" />
-  </svg>
-);
-
-function ChampPhoto({ name, libelle }: { name: string; libelle: string }) {
-  return (
-    <label className="flex h-[92px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] border-2 border-dashed border-[#A9B1C8] bg-white text-sm font-semibold text-encre">
-      {iconePhoto}
-      {libelle}
-            <input type="file" name={name} accept="image/*" className="sr-only" />
-    </label>
-  );
-}
+import { ChampPhoto } from '@/components/ChampPhoto';
 
 export default async function NouvelleCommande({ searchParams }: { searchParams: { client?: string } }) {
   const { supabase, atelier } = await getAtelier();
@@ -41,8 +25,8 @@ export default async function NouvelleCommande({ searchParams }: { searchParams:
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
-          <ChampPhoto name="photo_tissu" libelle="Photo du tissu" />
-          <ChampPhoto name="photo_modele" libelle="Photo du modèle" />
+          <ChampPhoto name="photo_tissu" libelle="Photo du tissu" atelierId={atelier.id} />
+          <ChampPhoto name="photo_modele" libelle="Photo du modèle" atelierId={atelier.id} />
         </div>
 
         <div className="flex flex-col gap-1.5">

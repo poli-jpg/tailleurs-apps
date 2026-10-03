@@ -9,15 +9,6 @@ import { MESURES } from '@/lib/mesures';
 import { STATUTS, type Statut } from '@/lib/statuts';
 import { entier, texte } from '@/lib/format';
 
-async function envoyerPhoto(supabase: SupabaseClient, atelierId: string, v: FormDataEntryValue | null) {
-  if (!(v instanceof File) || v.size === 0) return null;
-  const ext = (v.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
-  const chemin = `${atelierId}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from('photos').upload(chemin, v, { contentType: v.type || 'image/jpeg' });
-  if (error) throw new Error("La photo n'a pas pu être envoyée : " + error.message);
-  return chemin;
-}
-
 /** Cherche un client existant de l'atelier avec le même numéro (évite les doublons) */
 async function clientParTelephone(supabase: SupabaseClient, atelierId: string, telephone: string | null) {
   const chiffres = (telephone ?? '').replace(/\D/g, '').slice(-9);
@@ -114,10 +105,13 @@ export async function creerCommande(formData: FormData) {
   const modele = texte(formData.get('modele'));
   if (!modele) throw new Error('Indiquez le modèle.');
 
-  const [photo_tissu, photo_modele] = await Promise.all([
-    envoyerPhoto(supabase, atelier.id, formData.get('photo_tissu')),
-    envoyerPhoto(supabase, atelier.id, formData.get('photo_modele')),
-  ]);
+  // les photos sont déjà dans Supabase Storage (envoyées depuis le téléphone) : on garde juste leur chemin
+  const cheminPhoto = (v: FormDataEntryValue | null) => {
+    const c = texte(v);
+    return c && c.startsWith(`${atelier.id}/`) ? c : null;
+  };
+  const photo_tissu = cheminPhoto(formData.get('photo_tissu'));
+  const photo_modele = cheminPhoto(formData.get('photo_modele'));
 
   const { data: commande, error } = await supabase
     .from('commandes')
