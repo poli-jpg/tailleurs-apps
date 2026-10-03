@@ -4,12 +4,19 @@ import { initiales } from '@/lib/format';
 import { creerClient } from '@/app/actions';
 import { BoutonEnvoi } from '@/components/BoutonEnvoi';
 
-export default async function Clients({ searchParams }: { searchParams: { q?: string } }) {
+export default async function Clients({ searchParams }: { searchParams: { q?: string; tout?: string } }) {
   const { supabase, atelier } = await getAtelier();
   let requete = supabase.from('clients').select('id, nom, telephone').eq('atelier_id', atelier.id).order('nom');
   const q = (searchParams.q ?? '').trim();
   if (q) requete = requete.or(`nom.ilike.%${q.replace(/[%,()]/g, '')}%,telephone.ilike.%${q.replace(/[%,()]/g, '')}%`);
   const { data: clients } = await requete;
+
+  // 5 clients au départ, le reste derrière « Voir plus »
+  const LIMITE = 5;
+  const liste = clients ?? [];
+  const affiches = searchParams.tout === '1' ? liste : liste.slice(0, LIMITE);
+  const restants = liste.length - affiches.length;
+  const lienTout = `/clients?${new URLSearchParams({ ...(q ? { q } : {}), tout: '1' }).toString()}`;
 
   return (
     <main className="flex flex-col gap-4 px-5 pt-6">
@@ -46,7 +53,7 @@ export default async function Clients({ searchParams }: { searchParams: { q?: st
       </details>
 
       <ul className="flex flex-col gap-2">
-        {(clients ?? []).map((c) => (
+        {affiches.map((c) => (
           <li key={c.id}>
             <Link href={`/clients/${c.id}`} className="carte flex items-center gap-3 p-3.5">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-pale font-bold text-encre">{initiales(c.nom)}</span>
@@ -61,6 +68,12 @@ export default async function Clients({ searchParams }: { searchParams: { q?: st
           <li className="text-sm text-doux">{q ? 'Aucun client trouvé.' : 'Aucun client pour l’instant. Ajoutez-en un ci-dessus.'}</li>
         )}
       </ul>
+
+      {restants > 0 && (
+        <Link href={lienTout} scroll={false} className="flex h-12 w-full items-center justify-center rounded-xl border border-[#D9DEEA] bg-white text-sm font-semibold text-encre active:bg-fond">
+          Voir plus ({restants} autre{restants > 1 ? 's' : ''})
+        </Link>
+      )}
     </main>
   );
 }
