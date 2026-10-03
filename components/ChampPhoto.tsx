@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { compresserImage } from '@/lib/image';
 
 /**
- * La photo part directement du téléphone vers Supabase Storage,
- * sans passer par Vercel : pas de limite de 4,5 Mo.
+ * La photo est réduite sur le téléphone (environ 300 Ko), puis envoyée
+ * directement vers Supabase Storage, sans passer par Vercel.
  * Le formulaire reçoit seulement le chemin du fichier.
  */
 export function ChampPhoto({ name, libelle, atelierId }: { name: string; libelle: string; atelierId: string }) {
@@ -29,12 +30,12 @@ export function ChampPhoto({ name, libelle, atelierId }: { name: string; libelle
     setErreur('');
     setChemin('');
 
-    const ext = (fichier.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    const { blob, type, ext } = await compresserImage(fichier);
     const nouveauChemin = `${atelierId}/${crypto.randomUUID()}.${ext}`;
     const supabase = createClient();
     const { error } = await supabase.storage
       .from('photos')
-      .upload(nouveauChemin, fichier, { contentType: fichier.type || 'image/jpeg', upsert: false });
+      .upload(nouveauChemin, blob, { contentType: type, upsert: false });
 
     if (error) {
       setEtat('erreur');
